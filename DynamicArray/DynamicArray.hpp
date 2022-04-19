@@ -45,17 +45,19 @@ public:
 
   void set_at(size_t i, T x) {
     if (i >= _size)
-      throw std::out_of_range("get_at(): index out of range");
+      throw std::out_of_range("set_at(): index out of range");
     data[i] = x;
   }
 
   T& operator[](size_t i) {
     if (i >= _size)
-      throw std::out_of_range("get_at(): index out of range");
+      throw std::out_of_range("operator[](): index out of range");
     return data[i];
   }
 
   void resize(size_t new_capacity) {
+    if (new_capacity <= 0)
+      throw std::runtime_error("resize(): resize to <= 0");
     auto tmp = new T[new_capacity]{0};
     _capacity = new_capacity;
     _size = std::min(_capacity, _size);
