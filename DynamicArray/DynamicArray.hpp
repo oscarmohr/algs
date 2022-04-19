@@ -71,6 +71,7 @@ public:
   }
 
   DynamicArray(T* arr, size_t n) : _size{n}, _capacity{std::max(n, 32UZ)} {
+    data = new T[capacity]{0};
     std::copy_n(arr, n, data);
   }
 
