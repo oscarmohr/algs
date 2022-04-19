@@ -17,7 +17,10 @@ int main() {
 
   print("inserting powers of two, one by one...");
   for (auto i = 0; i < 31; i++) {
+    auto cap = a.capacity();
     a.append(1 << i);
+    if (auto new_cap = a.capacity(); new_cap > cap)
+      print("resized from ", cap, " to ", new_cap);
     print("inserted ", 1 << i);
   }
   print("last element inserted is ", a.back());
@@ -47,7 +50,7 @@ int main() {
   
   print("printing out first 32 elements in sorted order... ",
         "powers of two should appear twice, ",
-        "and we have three ones from the first seperate append()");
+        "and one should appear thrice");
   for (size_t i = 0; i < 32; i++) {
     put(a[i], " ");
   }

@@ -30,6 +30,13 @@ public:
     _size += 1;
   }
 
+  void pop_back() {
+    if (_size <= 0) return;
+    _size -= 1;
+    if (4*_size <= _capacity)
+      resize(_capacity/2);
+  }
+
   T get_at(size_t i) {
     if (i >= _size)
       throw std::out_of_range("get_at(): index out of range");
@@ -59,6 +66,10 @@ public:
 
   DynamicArray(size_t capacity=32) : _size{0}, _capacity{std::max(capacity, 32UZ)} {
     data = new T[capacity]{0};
+  }
+
+  DynamicArray(T* arr, size_t n) : _size{n}, _capacity{std::max(n, 32UZ)} {
+    std::copy_n(arr, n, data);
   }
 
   ~DynamicArray() {
