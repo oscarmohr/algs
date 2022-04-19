@@ -17,11 +17,35 @@ public:
     return _capacity;
   }
 
-  size_t append(T x) {
+  T& back() {
+    if (_size == 0) 
+      throw std::out_of_range("back(): empty container");
+    return data[_size - 1];
+  }
+
+  void append(T x) {
     if (_size + 1 >= _capacity)
       resize(2*_capacity);
     data[_size] = x;
     _size += 1;
+  }
+
+  T get_at(size_t i) {
+    if (i >= _size)
+      throw std::out_of_range("get_at(): index out of range");
+    return data[i];
+  }
+
+  void set_at(size_t i, T x) {
+    if (i >= _size)
+      throw std::out_of_range("get_at(): index out of range");
+    data[i] = x;
+  }
+
+  T& operator[](size_t i) {
+    if (i >= _size)
+      throw std::out_of_range("get_at(): index out of range");
+    return data[i];
   }
 
   void resize(size_t new_capacity) {
@@ -33,7 +57,11 @@ public:
     data = tmp;
   }
 
-  DynamicArray(size_t capacity=32) : _capacity{std::max(capacity, 32UZ)} {
+  DynamicArray(size_t capacity=32) : _size{0}, _capacity{std::max(capacity, 32UZ)} {
     data = new T[capacity]{0};
+  }
+
+  ~DynamicArray() {
+    delete[] data;
   }
 };
