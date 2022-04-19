@@ -46,7 +46,8 @@ int main() {
   }
   
   print("printing out first 32 elements in sorted order... ",
-        "powers of two should appear twice");
+        "powers of two should appear twice, ",
+        "and we have three ones from the first seperate append()");
   for (size_t i = 0; i < 32; i++) {
     put(a[i], " ");
   }
