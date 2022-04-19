@@ -26,6 +26,21 @@ auto test_decreasing(auto h) {
   return good;
 }
 
+auto test_large_cardinality(auto h) {
+  auto N = 1e10;
+
+  for (auto i = 0; i < N; i++)
+    h.insert(i);
+
+  for (auto i = 0; i < N - 1; i++) {
+    if (h.min() != i) {
+      fail("incorrect minimum.");
+      break;
+    }
+    h.del();
+  }
+}
+
 auto test(auto t, const auto& args...) {
   auto good = true;
   try {
@@ -38,7 +53,7 @@ auto test(auto t, const auto& args...) {
   return good;
 }
 
-
 int main() {
   test_decreasing(MinHeap(50));
+  test_large_cardinality(MinHeap(12));
 }
