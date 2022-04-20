@@ -2,96 +2,108 @@
 #include <utility>
 #include <vector>
 
-using std::vector;
-
 template<typename T=int>
 class MinHeap {
 private:
   T* data;
-  size_t size;
-  size_t capacity;
-
-public:
-  vector<T> elems() {
-    auto out = vector<T>();
-    if (size) out.insert(end(out), &data[1], &data[size]);
-    return out;
-  }
-
-  size_t empty() {
-    return size <= 0;
-  }
-
-  size_t len() {
-    return size;
-  }
-
-  void resize(size_t new_capacity) {
-    auto tmp = new int[new_capacity + 1]{0};
-    auto n = new_capacity > capacity ? size + 1 : new_capacity + 1;
-    std::copy_n(data, n, tmp);
-    delete[] data;
-    data = tmp;
-    capacity = new_capacity;
-  }
-
-  int min() {
-    // die_if(size >= capacity);
-    if (size <= 0)
-      throw std::runtime_error("called min() on empty container");
-    return data[1];
-  }
+  size_t _size;
+  size_t _capacity;
 
   size_t parent(size_t i) {
     return std::max(i/2, 1UZ);
   }
 
   size_t left(size_t i) {
-    return std::min(2*i, size);
+    return std::min(2*i, _size);
   }
 
   size_t right(size_t i) {
-    return std::min(left(i) + 1, size);
+    return std::min(left(i) + 1, _size);
+  }
+
+  size_t minChild(size_t i) {
+    size_t l = left(i), r = right(i);
+    return data[l] <= data[r] ? l : r;
+  }
+
+  void bubbleDown(size_t i) {
+    for (size_t m = minChild(i); data[i] > data[m]; i = m, m = minChild(i))
+      std::swap(data[i], data[m]);
+  }
+
+  void bubbleUp(size_t i) {
+    for (size_t p = parent(i); data[i] < data[p]; i = p, p = parent(i))
+      std::swap(data[i], data[p]);
+  }
+
+public:
+  std::vector<T> elems() {
+    auto out = std::vector<T>();
+    if (_size) {
+      out.reserve(_size);
+      out.insert(end(out), &data[1], &data[_size]);
+    }
+    return out;
+  }
+
+  size_t empty() {
+    return !_size;
+  }
+
+  size_t size() {
+    return _size;
+  }
+
+  size_t capacity() {
+    return _capacity;
+  }
+
+  void resize(size_t new_capacity) {
+    if (!new_capacity)
+      throw std::runtime_error("resize(): resize to 0");
+
+    _capacity = new_capacity;
+    _size = std::min(_capacity, _size);
+
+    auto tmp = new int[_capacity + 1];
+    std::copy_n(data, _size + 1, tmp);
+
+    delete[] data;
+    data = tmp;
+  }
+
+  int min() {
+    if (!_size)
+      throw std::runtime_error("called min() on empty container");
+
+    return data[1];
   }
 
   void insert(T x) {
-    size += 1;
+    _size += 1;
 
-    if (size >= capacity)
-      resize(2*capacity);
+    if (_size >= _capacity)
+      resize(2 * _capacity);
 
-    data[size] = x;
+    data[_size] = x;
 
-    for (auto i = size; ;) {
-      auto p = parent(i);
-      if (data[i] >= data[p]) break;
-      std::swap(data[i], data[p]);
-      i = p;
-    }
+    bubbleUp(_size);
   }
 
-  void del() {
-    if (size < 1) return;
-    data[1] = data[size];
+  void pop_min() {
+    if (!_size) return;
+    data[1] = data[_size];
 
-    for (size_t i = 1; ;) {
-      auto l = left(i), r = right(i);
-      auto m = data[l] < data[r] ? l : r;
-      if (data[i] <= data[m]) break;
-      std::swap(data[i], data[m]);
-      i = m;
-    }
-    if (4*size <= capacity)
-      resize(capacity/2);
-    size -= 1;
+    _size -= 1;
+
+    bubbleDown(1);
+
+    if (_capacity > 4 * _size)
+      resize(_capacity/2);
   }
 
-  size_t get_capacity() {
-    return capacity;
-  }
-
-  MinHeap(size_t capacity=32) : size{0}, capacity{std::max(capacity, 32UZ)} {
-    data = new int[capacity + 1]{0};
+  MinHeap(size_t capacity=32) : _size{0}, _capacity{std::max(capacity, 32UZ)} {
+    data = new int[_capacity + 1];
   }
 
   ~MinHeap() {
