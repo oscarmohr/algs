@@ -50,8 +50,18 @@ int main() {
   
   print("printing out first 32 elements in sorted order... ",
         "powers of two should appear twice, ",
-        "and one should appear thrice");
-  for (size_t i = 0; i < 32; i++) {
-    put(a[i], " ");
-  }
+        "and one should appear thrice:");
+  for (size_t i = 0; i < 32; i++)
+    put(a[i], ' ');
+  print('\n');
+
+  print("DynamicArray from C-style array:");
+  auto n = 32;
+  auto x = new int[n];
+  std::iota(x, x + n, -n/2);
+  auto a1 = DynamicArray(x, n);
+
+  for (auto i = 0; i < n; i++)
+    put(x[i], ' ');
+  print();
 }
