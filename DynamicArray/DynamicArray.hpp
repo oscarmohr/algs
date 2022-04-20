@@ -23,55 +23,50 @@ public:
     return data[_size - 1];
   }
 
-  void append(T x) {
-    if (_size + 1 >= _capacity)
-      resize(2*_capacity);
-    data[_size] = x;
+  void push_back(T x) {
     _size += 1;
+
+    if (_size >= _capacity)
+      resize(2 * _capacity);
+
+    data[_size - 1] = x;
   }
 
   void pop_back() {
-    if (_size <= 0) return;
+    if (!_size) return;
     _size -= 1;
-    if (4*_size <= _capacity)
-      resize(_capacity/2);
-  }
 
-  T get_at(size_t i) {
-    if (i >= _size)
-      throw std::out_of_range("get_at(): index out of range");
-    return data[i];
-  }
-
-  void set_at(size_t i, T x) {
-    if (i >= _size)
-      throw std::out_of_range("set_at(): index out of range");
-    data[i] = x;
+    if (_capacity > 4 * _size)
+      resize(_capacity / 2);
   }
 
   T& operator[](size_t i) {
     if (i >= _size)
       throw std::out_of_range("operator[](): index out of range");
+
     return data[i];
   }
 
   void resize(size_t new_capacity) {
-    if (new_capacity <= 0)
-      throw std::runtime_error("resize(): resize to <= 0");
-    auto tmp = new T[new_capacity]{0};
+    if (!new_capacity)
+      throw std::runtime_error("resize(): resize to 0");
+
     _capacity = new_capacity;
     _size = std::min(_capacity, _size);
+
+    auto tmp = new T[_capacity];
     std::copy_n(data, _size, tmp);
+
     delete[] data;
     data = tmp;
   }
 
   DynamicArray(size_t capacity=32) : _size{0}, _capacity{std::max(capacity, 32UZ)} {
-    data = new T[capacity]{0};
+    data = new T[capacity];
   }
 
   DynamicArray(T* arr, size_t n) : _size{n}, _capacity{std::max(n, 32UZ)} {
-    data = new T[capacity]{0};
+    data = new T[_capacity];
     std::copy_n(arr, n, data);
   }
 
