@@ -14,31 +14,42 @@ void pass(string msg="") {
 auto test_decreasing(auto h) {
   auto N = 1000;
   auto good = true;
+
   print("[ TEST ] testing decreasing values from N=", N, " to -N=", -N, ".");
+
   for (auto i = N; good && i >= -N; i--) {
     h.insert(i);
     if (h.min() != i) {
       good = false;
+      fail("incorrect minimum.");
       break;
     }
   }
+
   good ? pass() : fail();
   return good;
 }
 
 auto test_large_cardinality(auto h) {
-  auto N = 1e10;
+  auto N = 1e4;
+  auto good = true;
+
+  print("[ TEST ] testing large cardinality of ", N);
 
   for (auto i = 0; i < N; i++)
     h.insert(i);
 
   for (auto i = 0; i < N - 1; i++) {
     if (h.min() != i) {
+      good = false;
       fail("incorrect minimum.");
       break;
     }
     h.del();
   }
+
+  good ? pass() : fail();
+  return good;
 }
 
 auto test(auto t, const auto& args...) {
