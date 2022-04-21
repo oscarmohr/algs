@@ -44,7 +44,7 @@ private:
       throw std::out_of_range("minChild(): index out of range");
 
     size_t l = left(i), r = right(i);
-    return data[l] <= data[r] ? l : r;
+    return r >= _size || data[l] <= data[r] ? l : r;
   }
 
   // makes i root of a subheap, assuming its children are heaps
