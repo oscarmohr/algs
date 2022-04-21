@@ -5,45 +5,83 @@
 template<typename T=int>
 class MinHeap {
 private:
+public:
   T* data;
   size_t _size;
   size_t _capacity;
 
+  // leaves reside in data[_size / 2], ..., data[_size - 1]
+  bool is_leaf(size_t i) {
+    return _size / 2 <= i && i <= _size - 1;
+  }
+
+  // heap-property of subtree rooted at i
+  bool is_heap(size_t i=0) {
+    if (i >= _size || is_leaf(i))
+      return true;
+
+    // minChild is defined for internal nodes
+    if (data[i] > data[minChild(i)])
+      return false;
+
+    return is_heap(left(i)) && is_heap(right(i));
+  }
+
   size_t parent(size_t i) {
-    return std::max(i/2, 1UZ);
+    return (i - 1) / 2;
   }
 
   size_t left(size_t i) {
-    return std::min(2*i, _size);
+    return 2 * i + 1;
   }
 
   size_t right(size_t i) {
-    return std::min(left(i) + 1, _size);
+    return left(i) + 1;
   }
 
   size_t minChild(size_t i) {
+    // assumes i is internal node
+    if (i >= _size || is_leaf(i))
+      throw std::out_of_range("minChild(): index out of range");
+
     size_t l = left(i), r = right(i);
     return data[l] <= data[r] ? l : r;
   }
 
+  // makes i root of a subheap, assuming its children are heaps
   void bubbleDown(size_t i) {
-    for (size_t m = minChild(i); data[i] > data[m]; i = m, m = minChild(i))
+    if (i >= _size || is_leaf(i)) return;
+    if (auto m = minChild(i); data[i] > data[m]) {
       std::swap(data[i], data[m]);
+      bubbleDown(m);
+    }
   }
 
   void bubbleUp(size_t i) {
-    for (size_t p = parent(i); data[i] < data[p]; i = p, p = parent(i))
+    if (!i) return;
+    if (auto p = parent(i); data[i] < data[p]) {
       std::swap(data[i], data[p]);
+      bubbleUp(p);
+    }
+  }
+
+  void heapify() {
+    if (_size <= 1) return;
+
+    // bubble down internal nodes
+    for (int i = _size / 2 - 1; i >= 0; i--)
+      bubbleDown(i);
   }
 
 public:
   std::vector<T> elems() {
-    auto out = std::vector<T>();
-    if (_size) {
-      out.reserve(_size);
-      out.insert(end(out), &data[1], &data[_size]);
-    }
-    return out;
+    auto elems = std::vector<T>();
+    elems.reserve(_size);
+
+    for (size_t i = 0; i < _size; i++)
+      elems.push_back(data[i]);
+
+    return elems;
   }
 
   size_t empty() {
@@ -65,8 +103,8 @@ public:
     _capacity = new_capacity;
     _size = std::min(_capacity, _size);
 
-    auto tmp = new int[_capacity + 1];
-    std::copy_n(data, _size + 1, tmp);
+    auto tmp = new int[_capacity];
+    std::copy_n(data, _size, tmp);
 
     delete[] data;
     data = tmp;
@@ -76,7 +114,7 @@ public:
     if (!_size)
       throw std::runtime_error("called min() on empty container");
 
-    return data[1];
+    return data[0];
   }
 
   void insert(T x) {
@@ -85,25 +123,31 @@ public:
     if (_size >= _capacity)
       resize(2 * _capacity);
 
-    data[_size] = x;
+    data[_size - 1] = x;
 
-    bubbleUp(_size);
+    bubbleUp(_size - 1);
   }
 
   void pop_min() {
     if (!_size) return;
-    data[1] = data[_size];
+    data[0] = data[_size - 1];
 
     _size -= 1;
 
-    bubbleDown(1);
+    bubbleDown(0);
 
     if (_capacity > 4 * _size)
       resize(_capacity/2);
   }
 
   MinHeap(size_t capacity=32) : _size{0}, _capacity{std::max(capacity, 32UZ)} {
-    data = new int[_capacity + 1];
+    data = new int[_capacity];
+  }
+
+  MinHeap(T* arr, size_t n) : _size{n}, _capacity{2*_size} {
+    data = new int[_capacity];
+    std::copy_n(arr, _size, data);
+    heapify();
   }
 
   ~MinHeap() {
