@@ -70,8 +70,6 @@ auto test_array_initialization() {
 
   delete[] tmp;
 
-  print("Heap says it is a heap: ", h.is_heap() ? "true" : "false");
-
   auto ref = std::vector<int>();
 
   for (auto i = 0; i < N; i++) {

@@ -23,20 +23,30 @@ int main() {
 
   // remove minimal element
   print("removing minimum.");
-  h.del();
+  h.pop_min();
 
   // min is back to 8 again
   print("min is now again ", h.min());
 
-  /* auto pmin = [&]{ print("min() = ", h.min()); }; */
-  /* auto pst = [&]{ */
-  /*   put("size = ", h.len(), ", capacity = ", h.get_capacity(), "\n\tdata = "); */
-  /*   if (auto st = h.elems(); not h.empty()) */
-  /*     print_container(h.elems()); */
-  /*   else */
-  /*     print("( )"); */
-  /* }; */
+  print("Sorting an array: ");
+  constexpr size_t n = 32;
+  auto arr = new int[n];
 
-  /* pst(); */
+  for (size_t i = 0; i < n; i++)
+    arr[i] = rand() % n;
 
+  print("The array:");
+  for (size_t i = 0; i < n; i++) {
+    put(arr[i], ' ');
+  }
+  print('\n');
+
+  auto h2 = MinHeap(arr, n);
+
+  print("repeatedly printing its minimal element:");
+  for (size_t i = 0; i < n; i++) {
+    put(h2.min(), ' ');
+    h2.pop_min();
+  }
+  print();
 }

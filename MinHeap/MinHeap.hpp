@@ -5,7 +5,6 @@
 template<typename T=int>
 class MinHeap {
 private:
-public:
   T* data;
   size_t _size;
   size_t _capacity;
